@@ -1,0 +1,25 @@
+{% extends 'base/admin_base.html' %}
+
+{% block content %}
+<div class="card mb-6">
+    <div class="card-header"><h3 class="m-0">System Analytics</h3></div>
+    <div class="card-body">
+        <p class="text-muted">Detailed system analytics and export functionality are currently under development.</p>
+        
+        <div class="grid-cols-2 mt-4">
+            <div style="padding: 2rem; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); text-align: center;">
+                <i class="fas fa-file-export" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                <h4>Export User Data</h4>
+                <p class="text-muted" style="font-size: 0.875rem;">Download all user records as CSV.</p>
+                <button class="btn btn-outline" disabled>Coming Soon</button>
+            </div>
+            <div style="padding: 2rem; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); text-align: center;">
+                <i class="fas fa-chart-line" style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                <h4>Generate Report</h4>
+                <p class="text-muted" style="font-size: 0.875rem;">Generate a comprehensive PDF report.</p>
+                <button class="btn btn-outline" disabled>Coming Soon</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

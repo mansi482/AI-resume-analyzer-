@@ -1,0 +1,59 @@
+{% extends 'base/user_base.html' %}
+
+{% block content %}
+<div class="grid-cols-2">
+    <!-- Submit Feedback Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="m-0">Submit Feedback or Issue</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="form-group">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div style="color: var(--danger); font-size: 0.75rem; margin-top: 0.25rem;">
+                                {{ field.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-paper-plane"></i> Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feedback History -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="m-0">My Submissions</h3>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            {% if my_feedbacks %}
+                <ul class="list-group" style="list-style: none; padding: 0; margin: 0;">
+                    {% for fb in my_feedbacks %}
+                    <li style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="m-0" style="font-size: 1rem;">{{ fb.subject }}</h4>
+                            <span class="badge badge-{% if fb.status == 'resolved' %}success{% elif fb.status == 'in_progress' %}warning{% else %}primary{% endif %}">
+                                {{ fb.get_status_display }}
+                            </span>
+                        </div>
+                        <p class="text-muted m-0" style="font-size: 0.875rem;">Type: {{ fb.get_feedback_type_display }} | Submitted: {{ fb.created_at|date:"M d, Y" }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div style="padding: 3rem; text-align: center;">
+                    <p class="text-muted m-0">You haven't submitted any feedback yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

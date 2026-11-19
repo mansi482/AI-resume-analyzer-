@@ -1,0 +1,155 @@
+{% extends 'base/user_base.html' %}
+
+{% block content %}
+<div class="grid-cols-3">
+    <!-- Navigation -->
+    <div style="grid-column: span 1;">
+        <div class="card">
+            <div class="card-body" style="padding: 0;">
+                <div style="padding: 1.5rem; text-align: center; border-bottom: 1px solid var(--border);">
+                    <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1rem;">
+                        {{ user.first_name|default:user.email|make_list|first|upper }}
+                    </div>
+                    <h3 class="m-0">{{ user.get_full_name }}</h3>
+                    <p class="text-muted m-0" style="font-size: 0.875rem;">{{ user.email }}</p>
+                </div>
+                <div class="list-group">
+                    <a href="#basic-info" class="nav-item" style="color: var(--text); padding: 1rem 1.5rem; border-radius: 0; margin: 0; display: block;" onclick="switchTab('basic-info', this)">
+                        <i class="fas fa-user" style="width: 24px;"></i> Basic Info
+                    </a>
+                    <a href="#skills-cert" class="nav-item" style="color: var(--text); padding: 1rem 1.5rem; border-radius: 0; margin: 0; display: block;" onclick="switchTab('skills-cert', this)">
+                        <i class="fas fa-tools" style="width: 24px;"></i> Skills & Certs
+                    </a>
+                    <a href="#password" class="nav-item" style="color: var(--text); padding: 1rem 1.5rem; border-radius: 0; margin: 0; display: block;" onclick="switchTab('password', this)">
+                        <i class="fas fa-lock" style="width: 24px;"></i> Security
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Area -->
+    <div style="grid-column: span 2;">
+        <!-- Basic Info -->
+        <div id="tab-basic-info" class="card tab-pane">
+            <div class="card-header"><h3 class="m-0">Basic Information</h3></div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="profile">
+                    
+                    <div class="grid-cols-2" style="gap: 1rem; margin-bottom: 1.25rem;">
+                        <div>
+                            <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div>
+                            <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.phone.id_for_label }}">Phone</label>
+                        {{ form.phone }}
+                    </div>
+                    
+                    <div class="grid-cols-2" style="gap: 1rem; margin-bottom: 1.25rem;">
+                        <div>
+                            <label class="form-label" for="{{ form.github_url.id_for_label }}"><i class="fab fa-github"></i> GitHub URL</label>
+                            {{ form.github_url }}
+                        </div>
+                        <div>
+                            <label class="form-label" for="{{ form.linkedin_url.id_for_label }}"><i class="fab fa-linkedin"></i> LinkedIn URL</label>
+                            {{ form.linkedin_url }}
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Skills & Certifications -->
+        <div id="tab-skills-cert" class="card tab-pane" style="display: none;">
+            <div class="card-header"><h3 class="m-0">Skills</h3></div>
+            <div class="card-body" style="border-bottom: 1px solid var(--border);">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="skills">
+                    <div class="form-group">
+                        <label class="form-label">Technical Skills (Comma separated)</label>
+                        <input type="text" name="skills" class="form-control" value="{{ skills_str }}" placeholder="Python, Django, React, Docker...">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Update Skills</button>
+                </form>
+            </div>
+            
+            <div class="card-header border-0"><h3 class="m-0">Certifications</h3></div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="certifications">
+                    <div class="form-group">
+                        <label class="form-label">Certifications (One per line)</label>
+                        <textarea name="certifications" class="form-control" rows="4" placeholder="AWS Certified Solutions Architect&#10;Google Professional Cloud Architect">{{ certs_str }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Update Certifications</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Security -->
+        <div id="tab-password" class="card tab-pane" style="display: none;">
+            <div class="card-header"><h3 class="m-0">Change Password</h3></div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="password">
+                    
+                    {% for field in pw_form %}
+                        <div class="form-group">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div style="color: var(--danger); font-size: 0.75rem; margin-top: 0.25rem;">
+                                    {{ field.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(tabId, el) {
+    // Hide all panes
+    document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+    // Show target
+    document.getElementById('tab-' + tabId).style.display = 'block';
+    
+    // Update active state
+    document.querySelectorAll('.list-group .nav-item').forEach(n => {
+        n.style.backgroundColor = 'transparent';
+        n.style.fontWeight = 'normal';
+    });
+    el.style.backgroundColor = 'var(--primary-light)';
+    el.style.fontWeight = '600';
+}
+
+// Set active tab on load based on hash or default
+window.onload = function() {
+    let hash = window.location.hash.substring(1);
+    if (!hash || !document.getElementById('tab-' + hash)) {
+        hash = 'basic-info';
+    }
+    const tabLink = document.querySelector(`.list-group a[href="#${hash}"]`);
+    if(tabLink) switchTab(hash, tabLink);
+}
+</script>
+{% endblock %}

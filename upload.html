@@ -1,0 +1,111 @@
+{% extends 'base/user_base.html' %}
+
+{% block extra_css %}
+<style>
+.upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 3rem;
+    text-align: center;
+    background-color: var(--surface);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+.upload-icon {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header">
+        <h3 class="m-0">Upload Resume</h3>
+    </div>
+    <div class="card-body">
+        <form action="{% url 'upload_resume' %}" method="POST" enctype="multipart/form-data" id="upload-form">
+            {% csrf_token %}
+            
+            <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <h4 style="margin-bottom: 0.5rem;">Click or drag file to this area to upload</h4>
+                <p class="text-muted" style="font-size: 0.875rem;">Support for a single PDF or DOCX file (Max 10MB)</p>
+                
+                <input type="file" name="resume_file" id="file-input" style="display: none;" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="fileSelected()">
+            </div>
+            
+            <div id="file-info" style="display: none; margin-top: 1.5rem; padding: 1rem; background-color: var(--bg); border-radius: var(--radius); align-items: center; justify-content: space-between;">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-file-alt text-primary" style="font-size: 1.5rem;"></i>
+                    <span id="file-name" style="font-weight: 500;"></span>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm text-danger" onclick="clearFile(event)" style="border: none;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mt-6 flex justify-end gap-2">
+                <a href="{% url 'resume_list' %}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary" id="submit-btn" disabled>Upload Resume</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileInfo = document.getElementById('file-info');
+    const fileName = document.getElementById('file-name');
+    const submitBtn = document.getElementById('submit-btn');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length) {
+            fileInput.files = files;
+            fileSelected();
+        }
+    });
+
+    function fileSelected() {
+        if (fileInput.files.length > 0) {
+            fileName.textContent = fileInput.files[0].name;
+            fileInfo.style.display = 'flex';
+            submitBtn.disabled = false;
+        }
+    }
+
+    function clearFile(e) {
+        e.stopPropagation();
+        fileInput.value = '';
+        fileInfo.style.display = 'none';
+        submitBtn.disabled = true;
+    }
+</script>
+{% endblock %}

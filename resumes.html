@@ -1,0 +1,61 @@
+{% extends 'base/user_base.html' %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h3 class="m-0">My Resumes</h3>
+    <a href="{% url 'upload_resume' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Upload New Resume
+    </a>
+</div>
+
+{% if resumes %}
+    <div class="grid-cols-3">
+        {% for resume in resumes %}
+        <div class="card">
+            <div class="card-body text-center">
+                <div style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;">
+                    {% if resume.file_type == 'pdf' %}
+                        <i class="fas fa-file-pdf"></i>
+                    {% else %}
+                        <i class="fas fa-file-word" style="color: #2563EB;"></i>
+                    {% endif %}
+                </div>
+                <h4 style="font-size: 1rem; margin-bottom: 0.5rem; word-break: break-all;">{{ resume.filename }}</h4>
+                <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 1.5rem;">
+                    Uploaded on {{ resume.uploaded_at|date:"M d, Y" }}
+                </p>
+                
+                <div class="flex flex-col gap-2">
+                    <form action="{% url 'run_analysis' resume.id %}" method="POST" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-sm" style="width: 100%;">
+                            <i class="fas fa-magic"></i> Analyze
+                        </button>
+                    </form>
+                    
+                    <div class="flex gap-2">
+                        <a href="{% url 'download_resume' resume.id %}" class="btn btn-outline btn-sm" style="flex: 1;" title="Download">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <a href="{% url 'delete_resume' resume.id %}" class="btn btn-outline btn-sm" style="flex: 1; color: var(--danger); border-color: var(--danger);" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 4rem 2rem;">
+        <div style="font-size: 4rem; color: var(--border); margin-bottom: 1rem;">
+            <i class="fas fa-file-upload"></i>
+        </div>
+        <h3 class="mb-2">No Resumes Found</h3>
+        <p class="text-muted mb-4">You haven't uploaded any resumes yet. Get started by uploading one now.</p>
+        <a href="{% url 'upload_resume' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Upload Resume
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

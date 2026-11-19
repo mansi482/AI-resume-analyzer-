@@ -1,0 +1,85 @@
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/sidebar.css">
+{% endblock %}
+
+{% block body %}
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-brain"></i>
+            <span>AI Resume</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="{% url 'resume_list' %}" class="nav-item {% if request.resolver_match.url_name == 'resume_list' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i>
+                <span>Resumes</span>
+            </a>
+            <a href="{% url 'jd_match' %}" class="nav-item {% if request.resolver_match.url_name == 'jd_match' %}active{% endif %}">
+                <i class="fas fa-bullseye"></i>
+                <span>JD Match</span>
+            </a>
+            <a href="{% url 'improvement' %}" class="nav-item {% if request.resolver_match.url_name == 'improvement' %}active{% endif %}">
+                <i class="fas fa-magic"></i>
+                <span>AI Improve</span>
+            </a>
+            <a href="{% url 'analysis_history' %}" class="nav-item {% if request.resolver_match.url_name == 'analysis_history' %}active{% endif %}">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="{% url 'feedback' %}" class="nav-item {% if request.resolver_match.url_name == 'feedback' %}active{% endif %}">
+                <i class="fas fa-comment-dots"></i>
+                <span>Feedback</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item text-danger">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <h2 class="m-0" style="font-size: 1.25rem;">{{ page_title|default:"Dashboard" }}</h2>
+            
+            <div class="user-menu">
+                {% if user.is_admin_user %}
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-shield-alt"></i> Admin Panel
+                    </a>
+                {% endif %}
+                <a href="{% url 'notifications' %}" class="btn btn-outline btn-sm" style="position: relative;">
+                    <i class="fas fa-bell"></i>
+                    {% if unread_notifications > 0 %}
+                    <span style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">
+                        {{ unread_notifications }}
+                    </span>
+                    {% endif %}
+                </a>
+                <div class="user-avatar">
+                    {{ user.first_name|default:user.email|make_list|first|upper }}
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+{% endblock %}

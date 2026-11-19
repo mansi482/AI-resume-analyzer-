@@ -1,0 +1,59 @@
+{% extends 'base/admin_base.html' %}
+
+{% block content %}
+<div class="grid-cols-3">
+    <!-- Add Skill Form -->
+    <div class="card" style="grid-column: span 1; height: max-content;">
+        <div class="card-header"><h3 class="m-0">Add New Skill</h3></div>
+        <div class="card-body">
+            <form method="POST" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+                <div class="form-group">
+                    <label class="form-label">Skill Name</label>
+                    <input type="text" name="name" class="form-control" required placeholder="e.g., Python">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category (Optional)</label>
+                    <input type="text" name="category" class="form-control" placeholder="e.g., Backend">
+                </div>
+                <button type="submit" class="btn btn-primary w-100" style="width: 100%;">Add Skill</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Skills List -->
+    <div class="card" style="grid-column: span 2;">
+        <div class="card-header"><h3 class="m-0">Manage Skills</h3></div>
+        <div class="card-body" style="padding: 0; max-height: 600px; overflow-y: auto;">
+            <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                <thead style="position: sticky; top: 0; background: var(--bg); box-shadow: 0 1px 0 var(--border);">
+                    <tr>
+                        <th style="padding: 1rem 1.5rem; font-weight: 600;">Skill Name</th>
+                        <th style="padding: 1rem 1.5rem; font-weight: 600;">Category</th>
+                        <th style="padding: 1rem 1.5rem; font-weight: 600; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for skill in skills %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem 1.5rem; font-weight: 500;">{{ skill.name }}</td>
+                        <td style="padding: 1rem 1.5rem; color: var(--text-muted);">{{ skill.category|default:"-" }}</td>
+                        <td style="padding: 1rem 1.5rem; text-align: right;">
+                            <form method="POST" action="" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="skill_id" value="{{ skill.id }}">
+                                <button type="submit" class="btn btn-sm btn-outline text-danger" style="border: none;" onclick="return confirm('Delete this skill?');"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="padding: 2rem; text-align: center;">No skills defined.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

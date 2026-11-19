@@ -1,0 +1,54 @@
+{% extends 'base/user_base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="m-0">Analysis History</h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+        {% if analyses %}
+        <table style="width: 100%; text-align: left; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border); background-color: var(--bg);">
+                    <th style="padding: 1rem 1.5rem; font-weight: 600;">Date</th>
+                    <th style="padding: 1rem 1.5rem; font-weight: 600;">Resume</th>
+                    <th style="padding: 1rem 1.5rem; font-weight: 600;">ATS Score</th>
+                    <th style="padding: 1rem 1.5rem; font-weight: 600;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for analysis in analyses %}
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 1rem 1.5rem;">
+                        <div>{{ analysis.created_at|date:"M d, Y" }}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">{{ analysis.created_at|time:"h:i A" }}</div>
+                    </td>
+                    <td style="padding: 1rem 1.5rem; font-weight: 500;">
+                        {{ analysis.resume.filename }}
+                    </td>
+                    <td style="padding: 1rem 1.5rem;">
+                        <span class="badge badge-{% if analysis.ats_score >= 75 %}success{% elif analysis.ats_score >= 50 %}warning{% else %}danger{% endif %}">
+                            {{ analysis.ats_score|floatformat:0 }} / 100
+                        </span>
+                    </td>
+                    <td style="padding: 1rem 1.5rem;">
+                        <a href="{% url 'analysis_result' analysis.id %}" class="btn btn-sm btn-outline">View Report</a>
+                        <a href="{% url 'download_report' analysis.id %}" class="btn btn-sm btn-primary" title="Download PDF">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 3rem; text-align: center;">
+            <div style="font-size: 3rem; color: var(--border); margin-bottom: 1rem;"><i class="fas fa-history"></i></div>
+            <h4 class="mb-2">No History Found</h4>
+            <p class="text-muted mb-4">You haven't analyzed any resumes yet.</p>
+            <a href="{% url 'resume_list' %}" class="btn btn-primary">Go to Resumes</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

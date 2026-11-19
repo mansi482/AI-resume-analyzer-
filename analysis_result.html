@@ -1,0 +1,182 @@
+{% extends 'base/user_base.html' %}
+
+{% block extra_css %}
+<style>
+.score-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 auto 1rem;
+    border: 8px solid;
+}
+.score-success { border-color: var(--success); color: var(--success); }
+.score-warning { border-color: var(--warning); color: var(--warning); }
+.score-danger { border-color: var(--danger); color: var(--danger); }
+
+.list-group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.list-group li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+.list-group li:last-child { border-bottom: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h3 class="m-0">Analysis Report</h3>
+        <p class="text-muted m-0">For {{ analysis.resume.filename }}</p>
+    </div>
+    <a href="{% url 'download_report' analysis.id %}" class="btn btn-primary">
+        <i class="fas fa-file-pdf"></i> Download PDF
+    </a>
+</div>
+
+<div class="grid-cols-2 mb-6">
+    <div class="card text-center">
+        <div class="card-body">
+            <h4 class="text-muted mb-4">ATS Compatibility Score</h4>
+            <div class="score-circle score-{{ ats_color }}">
+                {{ analysis.ats_score|floatformat:0 }}
+            </div>
+            <p class="text-muted">Score out of 100</p>
+        </div>
+    </div>
+    <div class="card text-center">
+        <div class="card-body">
+            <h4 class="text-muted mb-4">Overall Resume Score</h4>
+            <div class="score-circle score-{{ resume_color }}">
+                {{ analysis.resume_score|floatformat:0 }}
+            </div>
+            <p class="text-muted">Score out of 100</p>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-6">
+    <div class="card-header">
+        <h3 class="m-0"><i class="fas fa-align-left text-primary"></i> Summary</h3>
+    </div>
+    <div class="card-body">
+        <p class="m-0" style="font-size: 1.125rem; line-height: 1.8;">{{ analysis.summary }}</p>
+    </div>
+</div>
+
+<div class="grid-cols-2 mb-6">
+    <div class="card">
+        <div class="card-header" style="background-color: var(--success); color: white;">
+            <h3 class="m-0" style="color: white;"><i class="fas fa-check-circle"></i> Strengths</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for item in analysis.strengths %}
+                <li><i class="fas fa-check text-success mt-1"></i> <span>{{ item }}</span></li>
+                {% empty %}
+                <li class="text-muted">No specific strengths identified.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" style="background-color: var(--danger); color: white;">
+            <h3 class="m-0" style="color: white;"><i class="fas fa-exclamation-triangle"></i> Weaknesses</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for item in analysis.weaknesses %}
+                <li><i class="fas fa-times text-danger mt-1"></i> <span>{{ item }}</span></li>
+                {% empty %}
+                <li class="text-muted">No specific weaknesses identified.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="grid-cols-2 mb-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="m-0"><i class="fas fa-spell-check text-accent"></i> Grammar & Spelling</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for item in analysis.grammar_suggestions %}
+                <li><i class="fas fa-pen text-accent mt-1"></i> <span>{{ item }}</span></li>
+                {% empty %}
+                <li class="text-muted">Looking good! No grammar issues found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="m-0"><i class="fas fa-paint-roller text-warning"></i> Formatting</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for item in analysis.formatting_suggestions %}
+                <li><i class="fas fa-paint-brush text-warning mt-1"></i> <span>{{ item }}</span></li>
+                {% empty %}
+                <li class="text-muted">Formatting looks professional.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-6">
+    <div class="card-header flex justify-between items-center">
+        <h3 class="m-0"><i class="fas fa-lightbulb text-warning"></i> AI Recommendations for Improvement</h3>
+        <a href="{% url 'improvement' %}" class="btn btn-sm btn-outline">Use AI Builder</a>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for item in analysis.ai_recommendations %}
+            <li><i class="fas fa-arrow-right text-primary mt-1"></i> <span style="font-size: 1.125rem;">{{ item }}</span></li>
+            {% empty %}
+            <li class="text-muted">No recommendations at this time.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="grid-cols-2">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="m-0"><i class="fas fa-tools text-primary"></i> Missing Skills to Add</h3>
+        </div>
+        <div class="card-body flex gap-2" style="flex-wrap: wrap;">
+            {% for skill in analysis.missing_skills %}
+            <span class="badge badge-warning" style="font-size: 0.875rem; padding: 0.5rem 1rem;">{{ skill }}</span>
+            {% empty %}
+            <span class="text-muted">No critical skills missing.</span>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="m-0"><i class="fas fa-key text-primary"></i> Suggested Keywords</h3>
+        </div>
+        <div class="card-body flex gap-2" style="flex-wrap: wrap;">
+            {% for kw in analysis.missing_keywords %}
+            <span class="badge badge-primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">{{ kw }}</span>
+            {% empty %}
+            <span class="text-muted">No keywords missing.</span>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

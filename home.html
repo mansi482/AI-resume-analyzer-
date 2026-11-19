@@ -1,0 +1,110 @@
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/pages/home.css">
+{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="container nav-container">
+        <a href="{% url 'home' %}" class="nav-brand">
+            <i class="fas fa-brain"></i>
+            AI Resume Analyzer
+        </a>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#how-it-works" class="nav-link">How it Works</a>
+            
+            {% if is_user %}
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
+            {% elif is_admin %}
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Admin Panel</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-link">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-primary">Get Started</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>Optimize Your Resume with AI</h1>
+        <p>Get instant feedback, ATS scoring, and actionable suggestions to land your dream job faster. Powered by advanced AI.</p>
+        <div class="flex justify-center gap-4 mt-8">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.125rem;">Go to Dashboard</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.125rem;">Start Free Analysis</a>
+                <a href="#how-it-works" class="btn btn-outline" style="padding: 1rem 2rem; font-size: 1.125rem;">Learn More</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features">
+    <div class="container">
+        <h2 class="section-title">Why Choose AI Resume Analyzer?</h2>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                <h3>Smart ATS Scoring</h3>
+                <p class="text-muted">Instantly know how Applicant Tracking Systems evaluate your resume before you apply.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
+                <h3>JD Matching</h3>
+                <p class="text-muted">Compare your resume against any job description to find missing keywords and skills.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-magic"></i></div>
+                <h3>AI Suggestions</h3>
+                <p class="text-muted">Get AI-generated rewrites for your summary, experience, and skills sections to maximize impact.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section id="how-it-works" class="features" style="background-color: var(--surface);">
+    <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        
+        <div class="grid-cols-3 text-center">
+            <div>
+                <div style="font-size: 3rem; color: var(--primary-light); font-weight: 800; margin-bottom: 1rem;">1</div>
+                <h4>Upload Resume</h4>
+                <p class="text-muted">Upload your current resume in PDF or DOCX format securely.</p>
+            </div>
+            <div>
+                <div style="font-size: 3rem; color: var(--primary-light); font-weight: 800; margin-bottom: 1rem;">2</div>
+                <h4>AI Analysis</h4>
+                <p class="text-muted">Our AI scans your resume for keywords, grammar, and formatting.</p>
+            </div>
+            <div>
+                <div style="font-size: 3rem; color: var(--primary-light); font-weight: 800; margin-bottom: 1rem;">3</div>
+                <h4>Get Report</h4>
+                <p class="text-muted">Download your comprehensive PDF report and start improving.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="flex items-center justify-center gap-2 mb-4" style="font-size: 1.5rem; font-weight: 700; color: white;">
+            <i class="fas fa-brain" style="color: var(--accent);"></i>
+            AI Resume Analyzer
+        </div>
+        <p class="footer-text">Helping professionals land their dream jobs with data-driven insights.</p>
+        <p class="footer-text mt-6" style="font-size: 0.875rem;">&copy; {% now "Y" %} AI Resume Analyzer. All rights reserved.</p>
+    </div>
+</footer>
+{% endblock %}

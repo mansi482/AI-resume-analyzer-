@@ -1,0 +1,117 @@
+{% extends 'base/user_base.html' %}
+
+{% block content %}
+<div class="grid-cols-2">
+    <div>
+        <div class="card mb-6">
+            <div class="card-header">
+                <h3 class="m-0">Match with Job Description</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" for="resume_id">Select Resume</label>
+                        <select name="resume_id" id="resume_id" class="form-control" required>
+                            <option value="">-- Choose a resume --</option>
+                            {% for resume in resumes %}
+                                <option value="{{ resume.id }}">{{ resume.filename }} ({{ resume.uploaded_at|date:"M d" }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="job_description">Paste Job Description</label>
+                        <textarea name="job_description" id="job_description" rows="10" class="form-control" required placeholder="Paste the full job description here..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100" style="width: 100%;">Analyze Match</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- History -->
+        {% if history %}
+        <div class="card">
+            <div class="card-header"><h3 class="m-0">Recent Matches</h3></div>
+            <div class="card-body" style="padding: 0;">
+                <ul class="list-group" style="list-style: none; padding: 0; margin: 0;">
+                    {% for h in history %}
+                    <li style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500;">{{ h.resume.filename }}</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">{{ h.created_at|date:"M d, Y" }}</div>
+                        </div>
+                        <span class="badge badge-{% if h.match_percentage >= 75 %}success{% elif h.match_percentage >= 50 %}warning{% else %}danger{% endif %}">
+                            {{ h.match_percentage|floatformat:0 }}% Match
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Results Area -->
+    <div>
+        {% if result %}
+            <div class="card" style="border-top: 4px solid var(--primary);">
+                <div class="card-body text-center">
+                    <h3 class="mb-4">Match Result</h3>
+                    <div style="width: 150px; height: 150px; border-radius: 50%; border: 8px solid {% if result.match_percentage >= 75 %}var(--success){% elif result.match_percentage >= 50 %}var(--warning){% else %}var(--danger){% endif %}; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; margin: 0 auto 1rem; color: {% if result.match_percentage >= 75 %}var(--success){% elif result.match_percentage >= 50 %}var(--warning){% else %}var(--danger){% endif %};">
+                        {{ result.match_percentage|floatformat:0 }}%
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-6">
+                <div class="card-header bg-success text-white">
+                    <h4 class="m-0"><i class="fas fa-check-circle"></i> Matching Skills</h4>
+                </div>
+                <div class="card-body flex gap-2" style="flex-wrap: wrap;">
+                    {% for skill in result.matching_skills %}
+                        <span class="badge badge-success">{{ skill }}</span>
+                    {% empty %}
+                        <span class="text-muted">No skills matched directly.</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card mt-6">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="m-0"><i class="fas fa-times-circle"></i> Missing Skills</h4>
+                </div>
+                <div class="card-body flex gap-2" style="flex-wrap: wrap;">
+                    {% for skill in result.missing_skills %}
+                        <span class="badge badge-danger">{{ skill }}</span>
+                    {% empty %}
+                        <span class="text-muted">No critical skills missing.</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card mt-6">
+                <div class="card-header">
+                    <h4 class="m-0"><i class="fas fa-lightbulb text-warning"></i> Improvement Suggestions</h4>
+                </div>
+                <div class="card-body">
+                    <ul style="padding-left: 1.5rem; margin: 0;">
+                        {% for tip in result.improvement_suggestions %}
+                            <li class="mb-2">{{ tip }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <div class="card" style="height: 100%; display: flex; align-items: center; justify-content: center; background-color: var(--bg); border: 2px dashed var(--border);">
+                <div class="text-center p-8 text-muted">
+                    <i class="fas fa-bullseye" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h4>Analysis Results</h4>
+                    <p>Select a resume and paste a job description to see how well you match.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

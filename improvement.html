@@ -1,0 +1,100 @@
+{% extends 'base/user_base.html' %}
+
+{% block content %}
+<div class="grid-cols-2">
+    <!-- Input Side -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="m-0">AI Resume Builder</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label" for="section">Select Section to Improve</label>
+                    <select name="section" id="section" class="form-control" required>
+                        {% for sec_val, sec_label, sec_icon in sections %}
+                            <option value="{{ sec_val }}" {% if selected_section == sec_val %}selected{% endif %}>{{ sec_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label class="form-label">Source Content</label>
+                    <div class="flex gap-4 mb-2">
+                        <label><input type="radio" name="source_type" value="resume" checked onchange="toggleSource()"> From Uploaded Resume</label>
+                        <label><input type="radio" name="source_type" value="custom" onchange="toggleSource()"> Paste Custom Text</label>
+                    </div>
+                </div>
+
+                <div id="source_resume" class="form-group">
+                    <select name="resume_id" class="form-control">
+                        <option value="">-- Choose a resume --</option>
+                        {% for resume in resumes %}
+                            <option value="{{ resume.id }}" {% if selected_resume.id == resume.id %}selected{% endif %}>{{ resume.filename }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div id="source_custom" class="form-group" style="display: none;">
+                    <textarea name="custom_content" rows="6" class="form-control" placeholder="Paste the text you want to improve here..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4" style="width: 100%;"><i class="fas fa-magic"></i> Generate Improvements</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Output Side -->
+    <div>
+        {% if result %}
+            <div class="card" style="border-top: 4px solid var(--accent);">
+                <div class="card-header flex justify-between items-center">
+                    <h3 class="m-0 text-accent"><i class="fas fa-sparkles"></i> AI Suggested Rewrite</h3>
+                    <button class="btn btn-sm btn-outline" onclick="copyToClipboard('improved-text')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <div class="card-body">
+                    <div id="improved-text" style="white-space: pre-wrap; font-size: 1rem; line-height: 1.6; padding: 1rem; background-color: var(--bg); border-radius: var(--radius); border: 1px solid var(--border);">{{ result.improved }}</div>
+                </div>
+            </div>
+
+            <div class="card mt-6">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="m-0"><i class="fas fa-lightbulb"></i> Why this works (Tips)</h4>
+                </div>
+                <div class="card-body">
+                    <ul style="padding-left: 1.5rem; margin: 0;">
+                        {% for tip in result.tips %}
+                            <li class="mb-2">{{ tip }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <div class="card" style="height: 100%; display: flex; align-items: center; justify-content: center; background-color: var(--bg); border: 2px dashed var(--border);">
+                <div class="text-center p-8 text-muted">
+                    <i class="fas fa-magic" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h4>AI Suggestions</h4>
+                    <p>Select a section and provide content to get AI-powered rewrites and formatting tips.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleSource() {
+    const isCustom = document.querySelector('input[name="source_type"][value="custom"]').checked;
+    document.getElementById('source_resume').style.display = isCustom ? 'none' : 'block';
+    document.getElementById('source_custom').style.display = isCustom ? 'block' : 'none';
+}
+
+function copyToClipboard(elementId) {
+    const text = document.getElementById(elementId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+    });
+}
+</script>
+{% endblock %}

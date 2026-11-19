@@ -1,0 +1,21 @@
+{% extends 'base/user_base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+    <div class="card-body" style="padding: 3rem 2rem;">
+        <div style="font-size: 4rem; color: var(--danger); margin-bottom: 1.5rem;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="mb-4">Delete Resume</h3>
+        <p class="text-muted mb-6">Are you sure you want to delete <strong>{{ resume.filename }}</strong>? This action cannot be undone and will also delete all associated analysis reports.</p>
+        
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div class="flex gap-4 justify-center">
+                <a href="{% url 'resume_list' %}" class="btn btn-outline" style="min-width: 120px;">Cancel</a>
+                <button type="submit" class="btn btn-danger" style="min-width: 120px;">Yes, Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

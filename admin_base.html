@@ -1,0 +1,81 @@
+{% extends 'base/base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/sidebar.css">
+<style>
+    .sidebar { background-color: #0F172A; } /* Slightly darker for admin */
+    .sidebar-header i { color: var(--danger); }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="app-container">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-shield-alt"></i>
+            <span>Admin Panel</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'admin_users' %}" class="nav-item {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+            </a>
+            <a href="{% url 'admin_resumes' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_resumes' %}active{% endif %}">
+                <i class="fas fa-file-pdf"></i>
+                <span>Resumes</span>
+            </a>
+            <a href="{% url 'admin_analysis' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_analysis' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analysis Reports</span>
+            </a>
+            <a href="{% url 'admin_skills' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_skills' %}active{% endif %}">
+                <i class="fas fa-tools"></i>
+                <span>Skills Master</span>
+            </a>
+            <a href="{% url 'admin_categories' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_categories' %}active{% endif %}">
+                <i class="fas fa-tags"></i>
+                <span>Job Categories</span>
+            </a>
+            <a href="{% url 'admin_feedback' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_feedback' %}active{% endif %}">
+                <i class="fas fa-comments"></i>
+                <span>Feedback</span>
+            </a>
+            <a href="{% url 'admin_analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_analytics' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i>
+                <span>Analytics</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to App</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <h2 class="m-0" style="font-size: 1.25rem;">{{ page_title|default:"Admin Dashboard" }}</h2>
+            
+            <div class="user-menu">
+                <span class="text-muted" style="font-size: 0.875rem;">Admin: {{ user.email }}</span>
+                <div class="user-avatar" style="background-color: var(--danger-light); color: var(--danger);">
+                    {{ user.first_name|default:user.email|make_list|first|upper }}
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+{% endblock %}
